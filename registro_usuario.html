@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewpoint" content="width=device-width, initial-scale=1.0">
+    <title>Registrarse </title>
+
+    <link rel="stylesheet" href="./css/custom.css">
+
+</head>
+<body>
+    
+<style>
+    body{ background-color: #334D8F; color: white;}
+</style>
+
+<style>
+    .form-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh; /* Esto hace que el contenedor ocupe toda la altura de la vista */
+    }
+  
+    .bigger-input {
+      width: 100%; /* Cambia este valor según tus necesidades */
+      font-size: 2em; /* Aumenta el tamaño de la fuente */
+    }
+  
+    label, .form-check-label {
+      font-size: 1.5em; /* Aumenta el tamaño de la fuente de las etiquetas */
+    }
+    body{ background-color: #334D8F; color: white;}
+  .form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Esto hace que el contenedor ocupe toda la altura de la vista */
+  }
+
+  .bigger-input {
+    width: 100%; /* Cambia este valor según tus necesidades */
+    font-size: 2em; /* Aumenta el tamaño de la fuente */
+  }
+
+  label, .form-check-label {
+    font-size: 1.5em; /* Aumenta el tamaño de la fuente de las etiquetas */
+  }
+
+
+        body {
+            font-family: Arial, sans-serif;
+            background:#334D8F;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #fff;
+        }
+
+        .contenedor {
+            background: #34495e;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .alerta {
+            padding: 20px;
+            background-color: #e74c3c; /* Color rojo */
+            color: white;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            position: absolute;
+            top: 200px; /* Ajusta esta propiedad para posicionar el mensaje */
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .icono-urgencia {
+            padding-right: 10px;
+            font-size: 20px;
+        }
+
+        input[type="text"], input[type="password"] {
+            margin: 10px 0;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        input[type="submit"] {
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            background: #2980b9;
+            color: white;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background: #3498db;
+        }
+</style>
+<div class="form-container">
+  <div class="alerta">
+    <span class="icono-urgencia">&#9888;</span> 
+    <strong>Error:</strong> El Usuario esta en uso.
+</div>
+  </style>
+  
+  <div class="form-container">
+        <form action="registro.php"  method="post">
+        <div class="form-group">
+            <label for="exampleInputUser">Usuario </label>
+            <input type="username" class="form-control bigger-input" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="@Usuario" name="usuario">
+          </div>
+      <div class="form-group">
+        <label for="exampleInputEmail1">Email </label>
+        <input type="email" class="form-control bigger-input" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="ejemplo@ejemplo.es" name="email">
+        <small id="emailHelp" class="form-text text-muted">No compartas el correo con nadie.</small>
+      </div>
+      <div class="form-group">
+        <label for="exampleInputUser">Nombre </label>
+        <input type="nombre" class="form-control bigger-input" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Nombre" name="nombre">
+      </div>
+      <div class="form-group">
+        <label for="exampleInputUser">Apellido </label>
+        <input type="apellido" class="form-control bigger-input" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Apellido" name="apellido">
+      </div>
+  <div class="form-group">
+  <div class="form-group">
+      <div class="form-group">
+        <label for="exampleInputPassword1">Contraseña</label>
+        <input type="password" class="form-control bigger-input" id="exampleInputPassword1" placeholder="Contraseña"name="clave" >
+      </div>
+      <div class="form-group form-check">
+        <input type="checkbox" class="form-check-input" id="exampleCheck1">
+        <label class="form-check-label" for="exampleCheck1">Guardar Contraseña</label>
+      </div>
+      <button type="submit" class="btn btn-primary bigger-input">Registrarse</button>
+    </form>
+  </div>
+  
+  
+  </body>
+  </html>
