@@ -475,18 +475,288 @@
 <div id="toast"></div>
 <input type="file" id="photoInput" accept="image/*" style="display:none" />
 
-<script>
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+  const SUPABASE_URL = 'https://zvsejixlenzfycxoohkw.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2c2VqaXhsZW56ZnljeG9vaGt3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2OTYwNDQsImV4cCI6MjA5MjI3MjA0NH0.o-VIgtJL5CqYvRmRXIwgEYeVGjBtYf38Gr7Phvcaol8';
+  const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
   const TOTAL_ROUNDS = 7;
-  // Puntos por posición (índice 0 = 1er lugar)
-  const PTS_BY_POS = [5, 4, 3, 2, 1];
+  const PTS_BY_POS   = [5, 4, 3, 2, 1];
 
-  let state = loadState();
+  let state = {
+    players: [],
+    rounds: {},
+    currentRound: parseInt(localStorage.getItem('currentRound')) || 1
+  };
 
-  function loadState() {
-    try { const r = localStorage.getItem('bolosLeague1'); if (r) return JSON.parse(r); } catch(e) {}
-    return { players: [], rounds: {}, currentRound: 1 };
+  // ── CARGAR DATOS ──
+  async function loadFromDB() {
+    const [{ data: players, error: e1 }, { data: results, error: e2 }] = await Promise.all([
+      db.from('players').select('*').order('created_at'),
+      db.from('round_results').select('*')
+    ]);
+    if (e1 || e2) return toast('ERROR AL CARGAR DATOS');
+    state.players = players || [];
+    state.rounds   = {};
+    (results || []).forEach(r => {
+      if (!state.rounds[r.round_number]) state.rounds[r.round_number] = [];
+      state.rounds[r.round_number].push({ id: r.player_id, score: r.score, pts: parseFloat(r.pts) });
+    });
+    render();
   }
-  function save() { localStorage.setItem('bolosLeague1', JSON.stringify(state)); }
+
+  // ── JUGADORES ──
+  async function addPlayer() {
+    const inp  = document.getElementById('newPlayerName');
+    const name = inp.value.trim().toUpperCase();
+    if (!name) return toast('¡ESCRIBE UN NOMBRE!');
+    if (state.players.length >= 8) return toast('MÁXIMO 8 JUGADORES');
+    if (state.players.find(p => p.name === name)) return toast('YA EXISTE ESE JUGADOR');
+    const { error } = await db.from('players').insert({ name });
+    if (error) return toast('ERROR: ' + error.message);
+    inp.value = '';
+    await loadFromDB();
+    toast('✓ ' + name + ' AÑADIDO');
+  }
+
+  async function removePlayer(id) {
+    const { error } = await db.from('players').delete().eq('id', id);
+    if (error) return toast('ERROR: ' + error.message);
+    await loadFromDB();
+    toast('JUGADOR ELIMINADO');
+  }
+
+  // ── GUARDAR RONDA ──
+  async function saveRound() {
+    if (state.players.length < 2) return toast('AÑADE AL MENOS 2 JUGADORES');
+    const entries = [];
+    let valid = true;
+    state.players.forEach(p => {
+      const inp = document.getElementById('score_' + p.id);
+      if (!inp) return;
+      const val = parseInt(inp.value);
+      if (isNaN(val) || val < 0) { valid = false; return; }
+      entries.push({ id: p.id, score: val });
+    });
+    if (!valid || entries.length === 0) return toast('REVISA LAS PUNTUACIONES');
+
+    entries.sort((a, b) => b.score - a.score);
+    let i = 0;
+    while (i < entries.length) {
+      let j = i;
+      while (j < entries.length - 1 && entries[j].score === entries[j+1].score) j++;
+      const pts = [];
+      for (let k = i; k <= j; k++) pts.push(PTS_BY_POS[k] ?? 0);
+      const shared = Math.round((pts.reduce((a,b)=>a+b,0) / pts.length) * 10) / 10;
+      for (let k = i; k <= j; k++) entries[k].pts = shared;
+      i = j + 1;
+    }
+
+    await db.from('round_results').delete().eq('round_number', state.currentRound);
+    const { error } = await db.from('round_results').insert(
+      entries.map(e => ({ round_number: state.currentRound, player_id: e.id, score: e.score, pts: e.pts }))
+    );
+    if (error) return toast('ERROR: ' + error.message);
+    await loadFromDB();
+    toast('✓ RONDA ' + state.currentRound + ' GUARDADA');
+  }
+
+  async function deleteRound(r) {
+    const { error } = await db.from('round_results').delete().eq('round_number', r);
+    if (error) return toast('ERROR: ' + error.message);
+    await loadFromDB();
+    toast('RONDA ' + r + ' ELIMINADA');
+  }
+
+  function setRound(r) {
+    state.currentRound = r;
+    localStorage.setItem('currentRound', r);
+    render();
+  }
+
+  // ── FOTO ──
+  function triggerUpload(pid) {
+    const inp = document.getElementById('photoInput');
+    inp.dataset.pid = pid;
+    inp.click();
+  }
+
+  document.getElementById('photoInput').addEventListener('change', function() {
+    const file = this.files[0];
+    if (!file) return;
+    const pid = parseInt(this.dataset.pid);
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = async () => {
+        const canvas = document.createElement('canvas');
+        const SIZE = 120;
+        canvas.width = SIZE; canvas.height = SIZE;
+        const ctx = canvas.getContext('2d');
+        const min = Math.min(img.width, img.height);
+        ctx.drawImage(img, (img.width-min)/2, (img.height-min)/2, min, min, 0, 0, SIZE, SIZE);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+        const { error } = await db.from('players').update({ photo: dataUrl }).eq('id', pid);
+        if (error) return toast('ERROR AL SUBIR FOTO');
+        const p = state.players.find(p => p.id === pid);
+        if (p) p.photo = dataUrl;
+        render();
+        toast('✓ FOTO ACTUALIZADA');
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+    this.value = '';
+  });
+
+  // ── RENDER ──
+  function avatarHTML(p, size=38) {
+    if (p.photo) return `<img class="avatar" src="${p.photo}" style="width:${size}px;height:${size}px" onclick="window._triggerUpload(${p.id})" />`;
+    return `<div class="avatar-placeholder" style="width:${size}px;height:${size}px" onclick="window._triggerUpload(${p.id})">📷</div>`;
+  }
+
+  function calcStats() {
+    const s = {};
+    state.players.forEach(p => { s[p.id] = { rounds:0, pts:0, best:0 }; });
+    Object.values(state.rounds).forEach(entries => {
+      entries.forEach(e => {
+        if (!s[e.id]) return;
+        s[e.id].rounds++;
+        s[e.id].pts += e.pts;
+        if (e.score > s[e.id].best) s[e.id].best = e.score;
+      });
+    });
+    return s;
+  }
+
+  function render() {
+    const r = state.currentRound;
+    document.getElementById('roundCardTitle').textContent = `🎳 REGISTRAR RONDA ${r}`;
+    document.getElementById('historialTitle').textContent = `📋 RESULTADO — RONDA ${r}`;
+    renderRounds(); renderProgress(); renderPtsInfo();
+    renderStandings(); renderScoreEntry(); renderRoundResult();
+  }
+
+  function renderRounds() {
+    const grid = document.getElementById('roundsGrid');
+    grid.innerHTML = '';
+    for (let r = 1; r <= TOTAL_ROUNDS; r++) {
+      const btn = document.createElement('button');
+      const played = !!state.rounds[r];
+      btn.className = 'r-btn' + (played?' played':'') + (r===state.currentRound?' active':'');
+      btn.innerHTML = `${r}<span class="r-sub">R${r}</span>${played?'<span class="r-badge">✓</span>':''}`;
+      btn.onclick = () => setRound(r);
+      grid.appendChild(btn);
+    }
+  }
+
+  function renderProgress() {
+    const done = Object.keys(state.rounds).length;
+    document.getElementById('progressText').textContent = `${done} / ${TOTAL_ROUNDS}`;
+    document.getElementById('progressFill').style.width = `${(done/TOTAL_ROUNDS)*100}%`;
+  }
+
+  function renderPtsInfo() {
+    const wrap = document.getElementById('ptsInfo');
+    wrap.innerHTML = '';
+    const n = Math.min(state.players.length || 5, PTS_BY_POS.length);
+    for (let i = 0; i < n; i++) {
+      const pill = document.createElement('span');
+      pill.className = 'pts-pill' + (i===0?' top':'');
+      pill.textContent = `${'1º2º3º4º5º'.slice(i*2,i*2+2)} = ${PTS_BY_POS[i]} PTS`;
+      wrap.appendChild(pill);
+    }
+  }
+
+  function renderStandings() {
+    const stats = calcStats();
+    const sorted = [...state.players].sort((a,b)=>(stats[b.id]?.pts||0)-(stats[a.id]?.pts||0));
+    const tbody = document.getElementById('standingsBody');
+    const empty = document.getElementById('standingsEmpty');
+    tbody.innerHTML = ''; empty.style.display = sorted.length?'none':'block';
+    sorted.forEach((p,i) => {
+      const s = stats[p.id]||{};
+      const tr = document.createElement('tr');
+      if (i===0) tr.className='r1'; else if(i===1) tr.className='r2'; else if(i===2) tr.className='r3';
+      const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'º';
+      tr.innerHTML = `<td>${medal}</td><td><div class="player-cell">${avatarHTML(p)}<span>${p.name}</span></div></td><td>${s.rounds||0}</td><td class="pts-col">${s.pts||0}</td><td>${s.best||0}</td><td><button class="btn-del" onclick="window._removePlayer(${p.id})">✕</button></td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function renderScoreEntry() {
+    const wrap = document.getElementById('scoreEntry');
+    if (!state.players.length) { wrap.innerHTML='<p class="empty">Añade jugadores primero</p>'; return; }
+    const existing = state.rounds[state.currentRound]||[];
+    wrap.innerHTML = '';
+    state.players.forEach(p => {
+      const prev = existing.find(e=>e.id===p.id);
+      const div = document.createElement('div');
+      div.className = 'score-row-player';
+      div.innerHTML = `${avatarHTML(p,36)}<div><div class="score-player-name">${p.name}</div><div class="score-player-sub">PUNTUACIÓN</div></div><input type="number" id="score_${p.id}" min="0" max="300" value="${prev?prev.score:0}" />`;
+      wrap.appendChild(div);
+    });
+  }
+
+  function renderRoundResult() {
+    const wrap = document.getElementById('roundResult');
+    const empty = document.getElementById('roundEmpty');
+    const entries = state.rounds[state.currentRound];
+    if (!entries?.length) { wrap.innerHTML=''; empty.style.display='block'; return; }
+    empty.style.display = 'none';
+    wrap.innerHTML = '';
+    [...entries].sort((a,b)=>b.score-a.score).forEach((e,i) => {
+      const p = state.players.find(p=>p.id===e.id);
+      const posClass = i===0?'p1':i===1?'p2':i===2?'p3':'';
+      const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'º';
+      const row = document.createElement('div');
+      row.className = 'result-row';
+      row.innerHTML = `<div class="result-pos ${posClass}">${medal}</div><div class="result-name">${p?p.name:'???'}</div><div class="result-score">${e.score}</div><div class="result-pts">+${e.pts} PTS</div>`;
+      wrap.appendChild(row);
+    });
+    const del = document.createElement('button');
+    del.className='btn-del'; del.style.marginTop='12px';
+    del.textContent='✕ BORRAR RONDA';
+    del.onclick = () => window._deleteRound(state.currentRound);
+    wrap.appendChild(del);
+  }
+
+  function toast(msg) {
+    const t = document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 2200);
+  }
+
+  // ── INTRO ──
+  function endIntro() {
+    const intro = document.getElementById('intro');
+    intro.classList.add('hide');
+    setTimeout(()=>intro.remove(), 500);
+  }
+  setTimeout(()=>document.getElementById('pins').classList.add('scatter'), 2000);
+  setTimeout(()=>{
+    document.getElementById('strikeText').classList.add('show');
+    document.getElementById('introSub').classList.add('show');
+  }, 2300);
+  setTimeout(endIntro, 4000);
+
+  // ── EXPONER FUNCIONES AL HTML ──
+  window._removePlayer  = removePlayer;
+  window._deleteRound   = deleteRound;
+  window._triggerUpload = triggerUpload;
+  window.addPlayer      = addPlayer;
+  window.saveRound      = saveRound;
+  window.skipIntro      = endIntro;
+
+  document.getElementById('newPlayerName').addEventListener('keydown', e => { if(e.key==='Enter') addPlayer(); });
+
+  // ── REALTIME: recargar si otro dispositivo cambia datos ──
+  db.channel('liga').on('postgres_changes', { event: '*', schema: 'public' }, () => loadFromDB()).subscribe();
+
+  // ── INICIO ──
+  loadFromDB();
+</script>
 
   // ── JUGADORES ──
   function addPlayer() {
