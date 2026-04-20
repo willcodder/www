@@ -3,599 +3,653 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Liga de Vuelos Familiar</title>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <title>Liga de Bolos Familiar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Bebas+Neue&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --neon-yellow: #f5e642;
-      --neon-cyan:   #42e8f5;
-      --neon-pink:   #f542d4;
-      --neon-green:  #42f587;
-      --bg:          #0a0a0f;
-      --panel:       #10101a;
-      --border:      #2a2a4a;
+      --bg:        #0f0904;
+      --bg2:       #1a1005;
+      --panel:     #231508;
+      --stripe1:   #c45a00;
+      --stripe2:   #e88a00;
+      --stripe3:   #f5b800;
+      --stripe4:   #3a1e00;
+      --orange:    #e8650a;
+      --amber:     #f5a800;
+      --cream:     #fdf0d5;
+      --red:       #cc2200;
+      --teal:      #2a8080;
+      --dark-text: #6b3a10;
+      --border:    #3a2010;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
     body {
-      font-family: 'Press Start 2P', monospace;
+      font-family: 'Nunito', sans-serif;
       background: var(--bg);
-      color: var(--neon-yellow);
+      color: var(--cream);
       min-height: 100vh;
-      padding: 20px;
-      position: relative;
-      overflow-x: hidden;
+      padding-bottom: 60px;
     }
 
-    /* CRT scanlines overlay */
-    body::after {
-      content: '';
-      position: fixed;
-      inset: 0;
+    /* ── FRANJAS RETRO (cabecera) ── */
+    .stripe-bar {
+      height: 10px;
       background: repeating-linear-gradient(
-        to bottom,
-        transparent,
-        transparent 2px,
-        rgba(0,0,0,0.18) 2px,
-        rgba(0,0,0,0.18) 4px
+        90deg,
+        var(--stripe4) 0px,   var(--stripe4) 30px,
+        var(--stripe1) 30px,  var(--stripe1) 60px,
+        var(--stripe2) 60px,  var(--stripe2) 90px,
+        var(--stripe3) 90px,  var(--stripe3) 120px,
+        var(--stripe2) 120px, var(--stripe2) 150px,
+        var(--stripe1) 150px, var(--stripe1) 180px
       );
-      pointer-events: none;
-      z-index: 9999;
     }
-
-    /* Subtle CRT flicker */
-    @keyframes flicker {
-      0%, 95%, 100% { opacity: 1; }
-      96% { opacity: 0.92; }
-      97% { opacity: 1; }
-      98% { opacity: 0.95; }
-    }
-    body { animation: flicker 8s infinite; }
 
     /* ── HEADER ── */
     header {
+      background: var(--bg2);
+      padding: 22px 18px 18px;
       text-align: center;
-      margin-bottom: 30px;
-      padding: 20px;
-      border: 2px solid var(--neon-yellow);
-      box-shadow: 0 0 20px var(--neon-yellow), inset 0 0 20px rgba(245,230,66,0.05);
-      background: var(--panel);
+      position: relative;
+      overflow: hidden;
+      border-bottom: 3px solid var(--stripe1);
     }
 
-    .league-icon { font-size: 2.5rem; margin-bottom: 10px; }
+    /* arco retro decorativo */
+    header::before {
+      content: '';
+      position: absolute;
+      bottom: -40px; left: 50%; transform: translateX(-50%);
+      width: 340px; height: 100px;
+      border: 14px solid var(--stripe1);
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+      opacity: 0.12;
+    }
+    header::after {
+      content: '';
+      position: absolute;
+      bottom: -50px; left: 50%; transform: translateX(-50%);
+      width: 280px; height: 80px;
+      border: 10px solid var(--stripe2);
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+      opacity: 0.1;
+    }
+
+    .header-icon {
+      font-size: 2.4rem;
+      display: block;
+      margin-bottom: 6px;
+      filter: drop-shadow(0 2px 6px rgba(232,100,10,0.6));
+    }
 
     header h1 {
-      font-size: clamp(0.8rem, 2.5vw, 1.4rem);
-      color: var(--neon-yellow);
-      text-shadow: 0 0 10px var(--neon-yellow);
+      font-family: 'Alfa Slab One', serif;
+      font-size: clamp(1.8rem, 8vw, 2.8rem);
+      color: var(--amber);
+      text-shadow: 3px 3px 0 #5a2800, 0 0 20px rgba(245,168,0,0.4);
+      line-height: 1;
       letter-spacing: 2px;
-      line-height: 1.6;
     }
 
-    header p {
+    header .sub {
+      font-family: 'Bebas Neue', cursive;
+      font-size: clamp(0.85rem, 3.5vw, 1.1rem);
+      color: var(--stripe1);
+      letter-spacing: 5px;
+      margin-top: 6px;
+    }
+
+    .header-badge {
+      display: inline-block;
       margin-top: 10px;
-      font-size: 0.5rem;
-      color: var(--neon-cyan);
-      text-shadow: 0 0 6px var(--neon-cyan);
+      background: var(--red);
+      color: var(--cream);
+      font-family: 'Bebas Neue', cursive;
+      font-size: 0.75rem;
+      letter-spacing: 3px;
+      padding: 4px 14px;
+      border-radius: 3px;
     }
 
-    /* ── BLINK ── */
-    @keyframes blink { 50% { opacity: 0; } }
-    .blink { animation: blink 1s step-start infinite; }
-
-    /* ── LAYOUT ── */
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      max-width: 1100px;
-      margin: 0 auto 30px;
+    /* ── FRANJAS LATERALES en panels ── */
+    .side-stripes {
+      border-left: 5px solid;
+      border-image: linear-gradient(to bottom, var(--stripe1), var(--stripe2), var(--stripe3)) 1;
     }
-    @media (max-width: 750px) { .grid { grid-template-columns: 1fr; } }
 
-    /* ── PANEL ── */
-    .panel {
+    /* ── SECCIÓN RONDAS ── */
+    .rounds-wrap {
       background: var(--panel);
-      border: 2px solid var(--border);
-      padding: 20px;
+      padding: 14px 14px 12px;
+      border-bottom: 2px solid var(--border);
     }
 
-    .panel-title {
-      font-size: 0.65rem;
-      color: var(--neon-cyan);
-      text-shadow: 0 0 8px var(--neon-cyan);
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 10px;
-      margin-bottom: 16px;
-      letter-spacing: 2px;
-    }
-
-    /* ── TABLA CLASIFICACIÓN ── */
-    .standings-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.5rem;
-    }
-
-    .standings-table th {
-      color: var(--neon-pink);
-      text-shadow: 0 0 6px var(--neon-pink);
-      padding: 8px 4px;
-      text-align: center;
-      border-bottom: 1px solid var(--border);
-    }
-    .standings-table th:first-child { text-align: left; }
-
-    .standings-table td {
-      padding: 8px 4px;
-      text-align: center;
-      border-bottom: 1px dotted var(--border);
-      color: var(--neon-yellow);
-    }
-    .standings-table td:first-child { text-align: left; }
-
-    .standings-table tr:hover td { background: rgba(66,232,245,0.05); }
-
-    .rank-1 td { color: var(--neon-yellow); text-shadow: 0 0 8px var(--neon-yellow); }
-    .rank-2 td { color: #c0c0c0; }
-    .rank-3 td { color: #cd7f32; }
-
-    .pts-col { color: var(--neon-green) !important; text-shadow: 0 0 6px var(--neon-green); font-weight: bold; }
-
-    /* ── FORMULARIO PARTIDO ── */
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
+    .section-label {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 0.85rem;
+      letter-spacing: 4px;
+      color: var(--stripe2);
       margin-bottom: 10px;
+      text-align: center;
     }
-    .form-row.three { grid-template-columns: 1fr auto 1fr; align-items: center; }
 
-    .form-group { display: flex; flex-direction: column; gap: 6px; }
-
-    label {
-      font-size: 0.4rem;
-      color: var(--neon-cyan);
-      text-shadow: 0 0 4px var(--neon-cyan);
+    .rounds-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      max-width: 500px;
+      margin: 0 auto;
     }
+
+    .r-btn {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+      background: var(--bg);
+      border: 2px solid var(--border);
+      color: var(--dark-text);
+      padding: 10px 4px 8px;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.18s;
+      position: relative;
+      text-align: center;
+      line-height: 1;
+    }
+    .r-btn .r-sub { display: block; font-size: 0.52rem; letter-spacing: 0; color: #4a2808; margin-top: 2px; font-family: 'Nunito', sans-serif; font-weight: 800; }
+    .r-btn.played { border-color: var(--stripe1); color: var(--stripe1); }
+    .r-btn.active  {
+      background: var(--stripe1);
+      border-color: var(--amber);
+      color: var(--cream);
+      box-shadow: 0 0 12px rgba(232,100,10,0.5);
+    }
+    .r-btn.active .r-sub { color: rgba(253,240,213,0.7); }
+    .r-badge {
+      position: absolute; top: -6px; right: -6px;
+      background: var(--red);
+      color: #fff;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.5rem; font-weight: 900;
+      width: 15px; height: 15px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ── PROGRESO ── */
+    .progress-wrap {
+      padding: 12px 14px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .progress-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .progress-row span { font-family: 'Bebas Neue', cursive; font-size: 0.8rem; letter-spacing: 2px; color: var(--stripe2); }
+    .progress-track { background: var(--panel); border-radius: 4px; height: 12px; overflow: hidden; border: 1px solid var(--border); }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--stripe1), var(--amber));
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+
+    /* ── CONTENEDOR ── */
+    .container { max-width: 500px; margin: 0 auto; padding: 14px; }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--panel);
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      padding: 16px;
+      margin-bottom: 14px;
+      border-left: 5px solid var(--stripe1);
+    }
+
+    .card-title {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 1.1rem;
+      letter-spacing: 4px;
+      color: var(--amber);
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    /* ── INPUTS ── */
+    .pilot-row { display: flex; gap: 8px; margin-bottom: 12px; }
+    .pilot-row input { flex: 1; }
 
     input, select {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 0.45rem;
-      background: #0d0d1a;
-      border: 1px solid var(--border);
-      color: var(--neon-yellow);
-      padding: 8px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 800;
+      background: var(--bg2);
+      border: 2px solid var(--border);
+      color: var(--cream);
+      padding: 12px 14px;
+      border-radius: 6px;
       width: 100%;
       outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
     }
-    input:focus, select:focus {
-      border-color: var(--neon-cyan);
-      box-shadow: 0 0 8px var(--neon-cyan);
+    input::placeholder { color: #5a3015; }
+    input:focus, select:focus { border-color: var(--stripe1); }
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath fill='%23e8650a' d='M5 7L0 0h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 13px center;
+      padding-right: 34px;
     }
-    input[type="number"] { text-align: center; }
+    select option { background: #1a1005; }
+    input[type="number"] { text-align: center; font-size: 1.5rem; font-weight: 900; color: var(--amber); }
 
-    .vs-label {
-      font-size: 0.7rem;
-      color: var(--neon-pink);
-      text-shadow: 0 0 8px var(--neon-pink);
+    label {
+      display: block;
+      font-family: 'Bebas Neue', cursive;
+      font-size: 0.72rem;
+      letter-spacing: 2px;
+      color: var(--stripe2);
+      margin-bottom: 5px;
+    }
+
+    .form-group { margin-bottom: 12px; }
+
+    /* VS / score layout */
+    .versus-row, .score-row {
+      display: grid;
+      grid-template-columns: 1fr 36px 1fr;
+      gap: 8px;
+      align-items: end;
+      margin-bottom: 12px;
+    }
+    .vs-mid, .score-mid {
+      font-family: 'Alfa Slab One', serif;
+      font-size: 1.2rem;
+      color: var(--stripe1);
       text-align: center;
+      padding-bottom: 10px;
     }
 
-    .btn {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 0.55rem;
-      cursor: pointer;
-      border: 2px solid;
-      padding: 10px 16px;
-      text-transform: uppercase;
-      transition: all 0.15s;
+    /* ── BOTONES ── */
+    .btn-main {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 1.2rem;
+      letter-spacing: 4px;
+      background: linear-gradient(135deg, var(--stripe1), #c45a00);
+      color: var(--cream);
+      border: none;
+      padding: 14px 20px;
+      border-radius: 6px;
       width: 100%;
-      margin-top: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #5a1e00;
+      transition: all 0.15s;
+      margin-top: 4px;
     }
+    .btn-main:active { transform: translateY(3px); box-shadow: 0 1px 0 #5a1e00; }
 
-    .btn-add {
-      background: transparent;
-      border-color: var(--neon-green);
-      color: var(--neon-green);
-      text-shadow: 0 0 6px var(--neon-green);
-      box-shadow: 0 0 10px rgba(66,245,135,0.2);
+    .btn-sm {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      background: var(--stripe1);
+      color: var(--cream);
+      border: none;
+      padding: 10px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
-    .btn-add:hover {
-      background: rgba(66,245,135,0.1);
-      box-shadow: 0 0 20px rgba(66,245,135,0.5);
-    }
-    .btn-add:active { transform: scale(0.97); }
+    .btn-sm:active { opacity: 0.8; }
 
-    .btn-danger {
+    .btn-del {
       background: transparent;
-      border-color: #f55;
-      color: #f55;
-      font-size: 0.45rem;
-      padding: 6px 10px;
-      width: auto;
-      margin-top: 0;
+      border: 1px solid #663322;
+      color: #cc5533;
+      font-size: 0.7rem;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      flex-shrink: 0;
     }
-    .btn-danger:hover { background: rgba(255,85,85,0.1); }
+    .btn-del:active { opacity: 0.7; }
+
+    /* ── TABLA ── */
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    th {
+      font-family: 'Bebas Neue', cursive;
+      color: var(--stripe2);
+      font-weight: 400;
+      font-size: 0.72rem;
+      letter-spacing: 2px;
+      padding: 5px 3px 8px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    th:nth-child(2) { text-align: left; }
+    td { padding: 10px 3px; text-align: center; border-bottom: 1px solid rgba(58,32,16,0.6); font-weight: 800; }
+    td:nth-child(2) { text-align: left; font-weight: 900; font-size: 0.88rem; }
+    tr:hover td { background: rgba(232,100,10,0.05); }
+    .r1 td { color: var(--amber); }
+    .r2 td { color: #c8c8c8; }
+    .r3 td { color: #d4956a; }
+    .pts-col { font-family: 'Bebas Neue', cursive !important; font-size: 1.15rem !important; color: var(--amber) !important; }
 
     /* ── HISTORIAL ── */
-    .match-list { list-style: none; max-height: 340px; overflow-y: auto; }
-    .match-list::-webkit-scrollbar { width: 4px; }
-    .match-list::-webkit-scrollbar-thumb { background: var(--border); }
-
+    .match-list { list-style: none; }
     .match-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 6px;
-      border-bottom: 1px dotted var(--border);
-      font-size: 0.42rem;
-      gap: 8px;
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
     }
-    .match-item:hover { background: rgba(255,255,255,0.02); }
-
+    .match-item:last-child { border-bottom: none; }
+    .match-body { flex: 1; min-width: 0; }
+    .match-names { font-weight: 900; font-size: 0.88rem; color: var(--cream); }
+    .match-sub { font-size: 0.65rem; color: #8a5030; margin-top: 2px; }
     .match-score {
-      background: #0d0d1a;
+      font-family: 'Bebas Neue', cursive;
+      font-size: 1.3rem;
+      color: var(--orange);
+      background: var(--bg2);
       border: 1px solid var(--border);
-      padding: 4px 8px;
-      color: var(--neon-pink);
-      text-shadow: 0 0 4px var(--neon-pink);
+      border-radius: 4px;
+      padding: 3px 10px;
       white-space: nowrap;
       flex-shrink: 0;
     }
 
-    .match-players { flex: 1; min-width: 0; }
-    .match-player { color: var(--neon-yellow); }
-    .match-date { font-size: 0.35rem; color: #555; margin-top: 3px; }
+    /* ── PUNTOS RULE ── */
+    .rule-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+    .pill {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 0.72rem;
+      letter-spacing: 2px;
+      padding: 5px 10px;
+      border-radius: 4px;
+      border: 1px solid;
+    }
+    .pill-win  { border-color: var(--amber);  color: var(--amber); }
+    .pill-draw { border-color: #ccaa44;        color: #ccaa44; }
+    .pill-loss { border-color: #884422;        color: #884422; }
 
-    /* ── AÑADIR PILOTO ── */
-    .add-pilot-row {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-    .add-pilot-row input { flex: 1; }
-    .btn-pilot {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 0.4rem;
-      background: transparent;
-      border: 1px solid var(--neon-cyan);
-      color: var(--neon-cyan);
-      cursor: pointer;
-      padding: 8px 10px;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-    .btn-pilot:hover { background: rgba(66,232,245,0.1); }
+    /* ── EMPTY ── */
+    .empty { text-align: center; padding: 18px; color: #5a3015; font-size: 0.8rem; font-weight: 700; }
 
     /* ── TOAST ── */
     #toast {
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%) translateY(60px);
-      background: var(--panel);
-      border: 2px solid var(--neon-green);
-      color: var(--neon-green);
-      font-size: 0.5rem;
-      padding: 12px 20px;
-      text-shadow: 0 0 6px var(--neon-green);
-      box-shadow: 0 0 20px rgba(66,245,135,0.4);
-      transition: transform 0.3s;
-      z-index: 1000;
-      white-space: nowrap;
+      position: fixed; bottom: 20px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--stripe1);
+      color: var(--cream);
+      font-family: 'Bebas Neue', cursive;
+      font-size: 1rem; letter-spacing: 3px;
+      padding: 12px 24px;
+      border-radius: 6px;
+      box-shadow: 0 4px 0 #5a1e00, 0 6px 20px rgba(0,0,0,0.4);
+      transition: transform 0.3s ease;
+      z-index: 9999; white-space: nowrap;
     }
     #toast.show { transform: translateX(-50%) translateY(0); }
 
-    /* ── EMPTY STATE ── */
-    .empty {
-      font-size: 0.45rem;
-      color: #333;
-      text-align: center;
-      padding: 20px 0;
-    }
-
-    /* ── FOOTER ── */
-    footer {
-      text-align: center;
-      font-size: 0.4rem;
-      color: #333;
-      margin-top: 10px;
-    }
-
-    /* ── FULL-WIDTH PANEL ── */
-    .full-width {
-      max-width: 1100px;
-      margin: 0 auto 20px;
+    /* franjas decorativas separador */
+    .retro-divider {
+      height: 6px;
+      margin: 0 14px 14px;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--stripe4) 0, var(--stripe4) 20px,
+        var(--stripe1) 20px, var(--stripe1) 40px,
+        var(--stripe2) 40px, var(--stripe2) 60px,
+        var(--stripe3) 60px, var(--stripe3) 80px,
+        var(--stripe2) 80px, var(--stripe2) 100px,
+        var(--stripe1) 100px, var(--stripe1) 120px
+      );
+      border-radius: 3px;
+      opacity: 0.7;
     }
   </style>
 </head>
 <body>
 
+  <div class="stripe-bar"></div>
+
   <header>
-    <div class="league-icon">✈️</div>
-    <h1>★ LIGA DE VUELOS FAMILIAR ★</h1>
-    <p><span class="blink">▶</span> TEMPORADA 2026 — CLASIFICACIÓN OFICIAL <span class="blink">◀</span></p>
+    <span class="header-icon">🎳</span>
+    <h1>LIGA DE BOLOS</h1>
+    <div class="sub">TEMPORADA 2026 · FAMILIA</div>
+    <div class="header-badge">🎳 OPEN LANES NOW 🎳</div>
   </header>
 
-  <!-- GRID: Clasificación + Añadir Partido -->
-  <div class="grid">
+  <div class="stripe-bar"></div>
+
+  <!-- RONDAS -->
+  <div class="rounds-wrap">
+    <div class="section-label">SELECCIONA LA RONDA</div>
+    <div class="rounds-grid" id="roundsGrid"></div>
+  </div>
+
+  <!-- PROGRESO -->
+  <div class="progress-wrap">
+    <div class="progress-row">
+      <span>PROGRESO TEMPORADA</span>
+      <span id="progressText">0 / 7</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="retro-divider"></div>
+
+  <div class="container">
 
     <!-- CLASIFICACIÓN -->
-    <div class="panel">
-      <div class="panel-title">▸ CLASIFICACIÓN</div>
-
-      <div class="add-pilot-row">
-        <input type="text" id="newPilotName" placeholder="Nombre piloto..." maxlength="20" />
-        <button class="btn-pilot" onclick="addPilot()">+ AÑADIR</button>
+    <div class="card">
+      <div class="card-title">🏆 CLASIFICACIÓN GENERAL</div>
+      <div class="pilot-row">
+        <input type="text" id="newPilotName" placeholder="Nombre del jugador..." maxlength="14" />
+        <button class="btn-sm" onclick="addPilot()">+ AÑADIR</button>
       </div>
-
-      <table class="standings-table">
+      <table>
         <thead>
-          <tr>
-            <th>#</th>
-            <th>PILOTO</th>
-            <th>PJ</th>
-            <th>G</th>
-            <th>E</th>
-            <th>P</th>
-            <th>PTS</th>
-            <th></th>
-          </tr>
+          <tr><th>#</th><th>JUGADOR</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>PTS</th><th></th></tr>
         </thead>
-        <tbody id="standingsBody">
-        </tbody>
+        <tbody id="standingsBody"></tbody>
       </table>
-      <p class="empty" id="standingsEmpty">Sin pilotos aún. ¡Añade uno!</p>
+      <p class="empty" id="standingsEmpty">Añade los jugadors para empezar</p>
     </div>
 
-    <!-- AÑADIR RESULTADO -->
-    <div class="panel">
-      <div class="panel-title">▸ REGISTRAR PARTIDO</div>
+    <!-- REGISTRAR -->
+    <div class="card">
+      <div class="card-title" id="roundCardTitle">🎳 RONDA 1</div>
 
-      <div class="form-row three">
-        <div class="form-group">
-          <label>PILOTO A</label>
+      <div class="rule-pills">
+        <span class="pill pill-win">🏆 VICTORIA = 3 PTS</span>
+        <span class="pill pill-draw">🤝 EMPATE = 1 PT</span>
+        <span class="pill pill-loss">✈ DERROTA = 0 PTS</span>
+      </div>
+
+      <div class="versus-row">
+        <div>
+          <label>JUGADOR A</label>
           <select id="pilotA"></select>
         </div>
-        <div class="vs-label">VS</div>
-        <div class="form-group">
-          <label>PILOTO B</label>
+        <div class="vs-mid">VS</div>
+        <div>
+          <label>JUGADOR B</label>
           <select id="pilotB"></select>
         </div>
       </div>
 
-      <div class="form-row three">
-        <div class="form-group">
+      <div class="score-row">
+        <div>
           <label>PUNTOS A</label>
           <input type="number" id="scoreA" min="0" value="0" />
         </div>
-        <div></div>
-        <div class="form-group">
+        <div class="score-mid">—</div>
+        <div>
           <label>PUNTOS B</label>
           <input type="number" id="scoreB" min="0" value="0" />
         </div>
       </div>
 
-      <div class="form-group" style="margin-bottom:4px;">
-        <label>NOTAS (opcional)</label>
-        <input type="text" id="matchNote" placeholder="Ej: Ruta Madrid-BCN" maxlength="40" />
+      <div class="form-group">
+        <label>NOTA (opcional)</label>
+        <input type="text" id="matchNote" placeholder="Ej: Ruta Madrid–Barcelona" maxlength="40" />
       </div>
 
-      <button class="btn btn-add" onclick="addMatch()">▶ GUARDAR RESULTADO</button>
-
-      <div style="margin-top:16px;font-size:0.38rem;color:#444;line-height:1.8;">
-        PUNTOS LIGA: VICTORIA=3 · EMPATE=1 · DERROTA=0
-      </div>
+      <button class="btn-main" onclick="addMatch()">🎳 GUARDAR RESULTADO</button>
     </div>
-  </div>
 
-  <!-- HISTORIAL FULL WIDTH -->
-  <div class="full-width panel">
-    <div class="panel-title">▸ HISTORIAL DE PARTIDOS</div>
-    <ul class="match-list" id="matchList"></ul>
-    <p class="empty" id="matchEmpty">Sin partidos registrados todavía.</p>
+    <!-- HISTORIAL -->
+    <div class="card">
+      <div class="card-title" id="historialTitle">📋 PARTIDOS — RONDA 1</div>
+      <ul class="match-list" id="matchList"></ul>
+      <p class="empty" id="matchEmpty">Sin partidos en esta ronda</p>
+    </div>
+
   </div>
 
   <div id="toast"></div>
 
-  <footer>© 2026 LIGA FAMILIAR · HECHO CON ❤ Y MUCHO CAFÉ</footer>
-
   <script>
-    // ── STATE ──
+    const TOTAL_ROUNDS = 7;
     let state = loadState();
 
     function loadState() {
-      try {
-        const raw = localStorage.getItem('flightLeague');
-        if (raw) return JSON.parse(raw);
-      } catch(e) {}
-      return { pilots: [], matches: [] };
+      try { const r = localStorage.getItem('flightLeague4'); if (r) return JSON.parse(r); } catch(e) {}
+      return { pilots: [], matches: [], currentRound: 1 };
     }
+    function save() { localStorage.setItem('flightLeague4', JSON.stringify(state)); }
 
-    function saveState() {
-      localStorage.setItem('flightLeague', JSON.stringify(state));
-    }
-
-    // ── PILOTS ──
     function addPilot() {
-      const input = document.getElementById('newPilotName');
-      const name = input.value.trim().toUpperCase();
-      if (!name) return showToast('¡Escribe un nombre!');
-      if (state.pilots.find(p => p.name === name)) return showToast('Piloto ya existe');
-      state.pilots.push({ id: Date.now(), name, wins: 0, draws: 0, losses: 0, played: 0, pts: 0 });
-      input.value = '';
-      saveState();
-      render();
-      showToast('Piloto ' + name + ' añadido ✓');
+      const inp = document.getElementById('newPilotName');
+      const name = inp.value.trim().toUpperCase();
+      if (!name) return toast('¡ESCRIBE UN NOMBRE!');
+      if (state.pilots.length >= 8) return toast('MÁXIMO 8 JUGADORES');
+      if (state.pilots.find(p => p.name === name)) return toast('YA EXISTE ESE JUGADOR');
+      state.pilots.push({ id: Date.now(), name });
+      inp.value = ''; save(); render();
+      toast('✓ ' + name + ' AÑADIDO');
     }
 
     function removePilot(id) {
-      state.pilots = state.pilots.filter(p => p.id !== id);
-      // Remove matches involving this pilot
+      state.pilots  = state.pilots.filter(p => p.id !== id);
       state.matches = state.matches.filter(m => m.aId !== id && m.bId !== id);
-      recalcStats();
-      saveState();
-      render();
-      showToast('Piloto eliminado');
+      save(); render(); toast('JUGADOR ELIMINADO');
     }
 
-    // ── MATCHES ──
     function addMatch() {
       const aId = parseInt(document.getElementById('pilotA').value);
       const bId = parseInt(document.getElementById('pilotB').value);
-      const scoreA = parseInt(document.getElementById('scoreA').value) || 0;
-      const scoreB = parseInt(document.getElementById('scoreB').value) || 0;
+      const sA  = parseInt(document.getElementById('scoreA').value) || 0;
+      const sB  = parseInt(document.getElementById('scoreB').value) || 0;
       const note = document.getElementById('matchNote').value.trim();
-
-      if (!aId || !bId) return showToast('Selecciona dos pilotos');
-      if (aId === bId) return showToast('¡No puedes jugar contra ti mismo!');
-      if (scoreA < 0 || scoreB < 0) return showToast('Puntuación inválida');
-
-      state.matches.unshift({
-        id: Date.now(),
-        aId, bId, scoreA, scoreB, note,
-        date: new Date().toLocaleDateString('es-ES')
-      });
-
-      recalcStats();
-      saveState();
-      render();
-
+      if (!aId || !bId) return toast('SELECCIONA DOS JUGADORES');
+      if (aId === bId)  return toast('¡NO PUEDES JUGAR CONTIGO MISMO!');
+      state.matches.unshift({ id: Date.now(), round: state.currentRound, aId, bId, scoreA: sA, scoreB: sB, note, date: new Date().toLocaleDateString('es-ES') });
       document.getElementById('scoreA').value = 0;
       document.getElementById('scoreB').value = 0;
       document.getElementById('matchNote').value = '';
-
-      const pA = state.pilots.find(p => p.id === aId);
-      const pB = state.pilots.find(p => p.id === bId);
-      showToast(`${pA.name} ${scoreA}-${scoreB} ${pB.name} guardado ✓`);
+      const a = state.pilots.find(p => p.id === aId);
+      const b = state.pilots.find(p => p.id === bId);
+      save(); render();
+      toast(`✓ ${a.name} ${sA}–${sB} ${b.name}`);
     }
 
-    function removeMatch(id) {
-      state.matches = state.matches.filter(m => m.id !== id);
-      recalcStats();
-      saveState();
-      render();
-    }
+    function removeMatch(id) { state.matches = state.matches.filter(m => m.id !== id); save(); render(); }
+    function setRound(r) { state.currentRound = r; save(); render(); }
 
-    // ── RECALCULATE STATS ──
-    function recalcStats() {
-      state.pilots.forEach(p => { p.wins = 0; p.draws = 0; p.losses = 0; p.played = 0; p.pts = 0; });
+    function calcStats() {
+      const s = {};
+      state.pilots.forEach(p => { s[p.id] = { wins:0, draws:0, losses:0, played:0, pts:0 }; });
       state.matches.forEach(m => {
-        const a = state.pilots.find(p => p.id === m.aId);
-        const b = state.pilots.find(p => p.id === m.bId);
-        if (!a || !b) return;
+        const a = s[m.aId]; const b = s[m.bId]; if (!a||!b) return;
         a.played++; b.played++;
-        if (m.scoreA > m.scoreB) {
-          a.wins++; a.pts += 3;
-          b.losses++;
-        } else if (m.scoreB > m.scoreA) {
-          b.wins++; b.pts += 3;
-          a.losses++;
-        } else {
-          a.draws++; a.pts += 1;
-          b.draws++; b.pts += 1;
-        }
+        if      (m.scoreA > m.scoreB) { a.wins++; a.pts+=3; b.losses++; }
+        else if (m.scoreB > m.scoreA) { b.wins++; b.pts+=3; a.losses++; }
+        else                           { a.draws++; a.pts++; b.draws++; b.pts++; }
       });
+      return s;
     }
 
-    // ── RENDER ──
     function render() {
-      renderStandings();
-      renderSelectPilots();
-      renderMatches();
+      renderRounds(); renderProgress(); renderStandings(); renderSelects(); renderMatches();
+      document.getElementById('roundCardTitle').textContent  = `🎳 RONDA ${state.currentRound}`;
+      document.getElementById('historialTitle').textContent  = `📋 PARTIDOS — RONDA ${state.currentRound}`;
+    }
+
+    function renderRounds() {
+      const grid = document.getElementById('roundsGrid');
+      const withM = new Set(state.matches.map(m => m.round));
+      grid.innerHTML = '';
+      for (let r = 1; r <= TOTAL_ROUNDS; r++) {
+        const btn = document.createElement('button');
+        const count = state.matches.filter(m => m.round === r).length;
+        btn.className = 'r-btn' + (withM.has(r) ? ' played' : '') + (r === state.currentRound ? ' active' : '');
+        btn.innerHTML = `${r}<span class="r-sub">R${r}</span>${count > 0 ? `<span class="r-badge">${count}</span>` : ''}`;
+        btn.onclick = () => setRound(r);
+        grid.appendChild(btn);
+      }
+    }
+
+    function renderProgress() {
+      const done = new Set(state.matches.map(m => m.round)).size;
+      document.getElementById('progressText').textContent  = `${done} / ${TOTAL_ROUNDS}`;
+      document.getElementById('progressFill').style.width = `${(done / TOTAL_ROUNDS) * 100}%`;
     }
 
     function renderStandings() {
-      const sorted = [...state.pilots].sort((a, b) => b.pts - a.pts || b.wins - a.wins);
+      const stats = calcStats();
+      const sorted = [...state.pilots].sort((a,b) => (stats[b.id]?.pts||0)-(stats[a.id]?.pts||0)||(stats[b.id]?.wins||0)-(stats[a.id]?.wins||0));
       const tbody = document.getElementById('standingsBody');
       const empty = document.getElementById('standingsEmpty');
-      tbody.innerHTML = '';
-      empty.style.display = sorted.length ? 'none' : 'block';
-
+      tbody.innerHTML = ''; empty.style.display = sorted.length ? 'none' : 'block';
       sorted.forEach((p, i) => {
+        const s = stats[p.id] || {};
         const tr = document.createElement('tr');
-        if (i === 0 && sorted.length > 0) tr.className = 'rank-1';
-        else if (i === 1) tr.className = 'rank-2';
-        else if (i === 2) tr.className = 'rank-3';
-
-        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i+1);
-        tr.innerHTML = `
-          <td>${medal}</td>
-          <td>${p.name}</td>
-          <td>${p.played}</td>
-          <td>${p.wins}</td>
-          <td>${p.draws}</td>
-          <td>${p.losses}</td>
-          <td class="pts-col">${p.pts}</td>
-          <td><button class="btn-danger" onclick="removePilot(${p.id})">✕</button></td>
-        `;
+        if (i===0) tr.className='r1'; else if (i===1) tr.className='r2'; else if (i===2) tr.className='r3';
+        const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
+        tr.innerHTML = `<td>${medal}</td><td>${p.name}</td><td>${s.played||0}</td><td>${s.wins||0}</td><td>${s.draws||0}</td><td>${s.losses||0}</td><td class="pts-col">${s.pts||0}</td><td><button class="btn-del" onclick="removePilot(${p.id})">✕</button></td>`;
         tbody.appendChild(tr);
       });
     }
 
-    function renderSelectPilots() {
-      ['pilotA', 'pilotB'].forEach(id => {
-        const sel = document.getElementById(id);
-        const prev = parseInt(sel.value) || 0;
-        sel.innerHTML = '<option value="">— Seleccionar —</option>';
-        state.pilots.forEach(p => {
-          const opt = document.createElement('option');
-          opt.value = p.id;
-          opt.textContent = p.name;
-          if (p.id === prev) opt.selected = true;
-          sel.appendChild(opt);
-        });
+    function renderSelects() {
+      ['pilotA','pilotB'].forEach(id => {
+        const sel = document.getElementById(id); const prev = parseInt(sel.value)||0;
+        sel.innerHTML = '<option value="">— Elegir jugador —</option>';
+        state.pilots.forEach(p => { const o = document.createElement('option'); o.value=p.id; o.textContent=p.name; if(p.id===prev)o.selected=true; sel.appendChild(o); });
       });
     }
 
     function renderMatches() {
-      const ul = document.getElementById('matchList');
-      const empty = document.getElementById('matchEmpty');
-      ul.innerHTML = '';
-      empty.style.display = state.matches.length ? 'none' : 'block';
-
-      state.matches.forEach(m => {
-        const a = state.pilots.find(p => p.id === m.aId);
-        const b = state.pilots.find(p => p.id === m.bId);
-        const nameA = a ? a.name : '???';
-        const nameB = b ? b.name : '???';
-
-        let result = '';
-        if (m.scoreA > m.scoreB) result = `★ ${nameA} GANA`;
-        else if (m.scoreB > m.scoreA) result = `★ ${nameB} GANA`;
-        else result = 'EMPATE';
-
-        const li = document.createElement('li');
-        li.className = 'match-item';
-        li.innerHTML = `
-          <div class="match-players">
-            <div class="match-player">${nameA} vs ${nameB}</div>
-            <div class="match-date">${m.date}${m.note ? ' · ' + m.note : ''} · ${result}</div>
-          </div>
-          <div class="match-score">${m.scoreA} — ${m.scoreB}</div>
-          <button class="btn-danger" onclick="removeMatch(${m.id})">✕</button>
-        `;
+      const ul = document.getElementById('matchList'); const empty = document.getElementById('matchEmpty');
+      const list = state.matches.filter(m => m.round === state.currentRound);
+      ul.innerHTML = ''; empty.style.display = list.length ? 'none' : 'block';
+      list.forEach(m => {
+        const a = state.pilots.find(p=>p.id===m.aId); const b = state.pilots.find(p=>p.id===m.bId);
+        const nA = a?a.name:'???'; const nB = b?b.name:'???';
+        const winner = m.scoreA>m.scoreB?`🏆 ${nA}`:m.scoreB>m.scoreA?`🏆 ${nB}`:'🤝 EMPATE';
+        const li = document.createElement('li'); li.className='match-item';
+        li.innerHTML = `<div class="match-body"><div class="match-names">${nA} vs ${nB}</div><div class="match-sub">${m.date}${m.note?' · '+m.note:''} · ${winner}</div></div><div class="match-score">${m.scoreA}–${m.scoreB}</div><button class="btn-del" onclick="removeMatch(${m.id})">✕</button>`;
         ul.appendChild(li);
       });
     }
 
-    // ── TOAST ──
-    function showToast(msg) {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.classList.add('show');
+    function toast(msg) {
+      const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), 2200);
     }
 
-    // Enter key on pilot input
-    document.getElementById('newPilotName').addEventListener('keydown', e => {
-      if (e.key === 'Enter') addPilot();
-    });
-
-    // Init
+    document.getElementById('newPilotName').addEventListener('keydown', e => { if(e.key==='Enter') addPilot(); });
     render();
   </script>
 </body>
