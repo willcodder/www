@@ -117,7 +117,7 @@
     /* ── ENTRADA PUNTUACIONES RONDA ── */
     .score-entry { display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
     .score-row-player {
-      display:grid; grid-template-columns:1fr 90px;
+      display:grid; grid-template-columns:44px 1fr 90px;
       gap:10px; align-items:center;
       background:var(--bg2); border:1px solid var(--border);
       border-radius:6px; padding:10px 12px;
@@ -133,11 +133,28 @@
     .btn-del { background:transparent; border:1px solid #663322; color:#cc5533; font-size:.7rem; padding:4px 8px; border-radius:4px; cursor:pointer; font-family:'Nunito',sans-serif; font-weight:900; flex-shrink:0; }
     .btn-del:active { opacity:.7; }
 
+    /* ── AVATAR ── */
+    .avatar {
+      width:38px; height:38px; border-radius:50%;
+      object-fit:cover; border:2px solid var(--s1);
+      cursor:pointer; flex-shrink:0; display:block;
+      background:var(--bg2);
+    }
+    .avatar-placeholder {
+      width:38px; height:38px; border-radius:50%;
+      border:2px dashed var(--border); cursor:pointer;
+      flex-shrink:0; display:flex; align-items:center; justify-content:center;
+      font-size:1.1rem; background:var(--bg2); color:var(--muted);
+      transition:border-color .2s;
+    }
+    .avatar-placeholder:hover { border-color:var(--s1); }
+    .player-cell { display:flex; align-items:center; gap:8px; }
+
     /* ── TABLA CLASIFICACIÓN ── */
     table { width:100%; border-collapse:collapse; font-size:.82rem; }
     th { font-family:'Bebas Neue',cursive; color:var(--s2); font-weight:400; font-size:.72rem; letter-spacing:2px; padding:5px 3px 8px; text-align:center; border-bottom:1px solid var(--border); }
     th:nth-child(2) { text-align:left; }
-    td { padding:10px 3px; text-align:center; border-bottom:1px solid rgba(58,32,16,.6); font-weight:800; }
+    td { padding:8px 3px; text-align:center; border-bottom:1px solid rgba(58,32,16,.6); font-weight:800; vertical-align:middle; }
     td:nth-child(2) { text-align:left; font-weight:900; font-size:.88rem; }
     tr:hover td { background:rgba(232,100,10,.05); }
     .r1 td { color:var(--amber); }
@@ -255,6 +272,7 @@
 </div>
 
 <div id="toast"></div>
+<input type="file" id="photoInput" accept="image/*" style="display:none" />
 
 <script>
   const TOTAL_ROUNDS = 7;
@@ -401,6 +419,17 @@
     document.getElementById('progressFill').style.width = `${(done / TOTAL_ROUNDS) * 100}%`;
   }
 
+  function avatarHTML(p, size=38) {
+    if (p.photo) return `<img class="avatar" src="${p.photo}" style="width:${size}px;height:${size}px" onclick="triggerUpload(${p.id})" title="Cambiar foto" />`;
+    return `<div class="avatar-placeholder" style="width:${size}px;height:${size}px" onclick="triggerUpload(${p.id})" title="Añadir foto">📷</div>`;
+  }
+
+  function triggerUpload(playerId) {
+    const inp = document.getElementById('photoInput');
+    inp.dataset.pid = playerId;
+    inp.click();
+  }
+
   function renderStandings() {
     const stats = calcStats();
     const sorted = [...state.players].sort((a,b) => (stats[b.id]?.pts||0)-(stats[a.id]?.pts||0));
@@ -412,7 +441,7 @@
       const tr = document.createElement('tr');
       if (i===0) tr.className='r1'; else if (i===1) tr.className='r2'; else if (i===2) tr.className='r3';
       const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'º';
-      tr.innerHTML = `<td>${medal}</td><td>${p.name}</td><td>${s.rounds||0}</td><td class="pts-col">${s.pts||0}</td><td>${s.best||0}</td><td><button class="btn-del" onclick="removePlayer(${p.id})">✕</button></td>`;
+      tr.innerHTML = `<td>${medal}</td><td><div class="player-cell">${avatarHTML(p)} <span>${p.name}</span></div></td><td>${s.rounds||0}</td><td class="pts-col">${s.pts||0}</td><td>${s.best||0}</td><td><button class="btn-del" onclick="removePlayer(${p.id})">✕</button></td>`;
       tbody.appendChild(tr);
     });
   }
@@ -430,9 +459,10 @@
       const div = document.createElement('div');
       div.className = 'score-row-player';
       div.innerHTML = `
+        ${avatarHTML(p, 36)}
         <div>
           <div class="score-player-name">${p.name}</div>
-          <div class="score-player-sub">PUNTUACIÓN DE BOLOS</div>
+          <div class="score-player-sub">PUNTUACIÓN</div>
         </div>
         <input type="number" id="score_${p.id}" min="0" max="300" value="${prev ? prev.score : 0}" />`;
       wrap.appendChild(div);
@@ -480,6 +510,35 @@
   }
 
   document.getElementById('newPlayerName').addEventListener('keydown', e => { if(e.key==='Enter') addPlayer(); });
+
+  // ── SUBIR FOTO ──
+  document.getElementById('photoInput').addEventListener('change', function() {
+    const file = this.files[0];
+    if (!file) return;
+    const pid = parseInt(this.dataset.pid);
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        const SIZE = 120;
+        canvas.width = SIZE; canvas.height = SIZE;
+        const ctx = canvas.getContext('2d');
+        // Recortar cuadrado centrado
+        const min = Math.min(img.width, img.height);
+        const sx = (img.width - min) / 2;
+        const sy = (img.height - min) / 2;
+        ctx.drawImage(img, sx, sy, min, min, 0, 0, SIZE, SIZE);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+        const player = state.players.find(p => p.id === pid);
+        if (player) { player.photo = dataUrl; save(); render(); toast('✓ FOTO ACTUALIZADA'); }
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+    this.value = '';
+  });
+
   render();
 </script>
 </body>
